@@ -13,6 +13,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECRET_KEY")
+app.debug = True
 db = SQLAlchemy(app)
 app.config['UPLOAD_FOLDER'] = 'static/images'  # Ścieżka do przechowywania zdjęć
 
