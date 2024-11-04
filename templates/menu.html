@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Menu{% endblock %}
+
+{% block content %}
+
+<!-- Przycisk do rozwijania koszyka -->
+<button onclick="toggleCart()" id="cart-toggle-btn">
+    🛒 Pokaż Koszyk
+</button>
+
+<h1>Menu</h1>
+
+<!-- Wyświetlanie Lunchu Dnia tylko jeśli display_date to dzisiejsza data -->
+{% if 'Lunch Dnia' in categories %}
+    {% set today = current_time.date() %}
+    {% set lunch_items = categories['Lunch Dnia'] | selectattr('display_date', 'equalto', today) | list %}
+    {% if lunch_items %}
+        <h2>Lunch Dnia</h2>
+        <div class="category-section">
+            {% for item in lunch_items %}
+                <div class="menu-item">
+                    {% if item.image_filename %}
+                        <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                    {% endif %}
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.description }}</p>
+                    <p>Cena: {{ item.price }} PLN</p>
+                    {% if item.customizable %}
+                        <label>Personalizacja:</label>
+                        <input type="text" id="customization-{{ item.id }}" placeholder="Dostosuj zamówienie">
+                    {% endif %}
+                    <button id="add-to-cart-{{ item.id }}" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">Dodaj</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endif %}
+
+<!-- Wyświetlanie Deseru Dnia tylko jeśli display_date to dzisiejsza data -->
+{% if 'Deser Dnia' in categories %}
+    {% set dessert_items = categories['Deser Dnia'] | selectattr('display_date', 'equalto', today) | list %}
+    {% if dessert_items %}
+        <h2>Deser Dnia</h2>
+        <div class="category-section">
+            {% for item in dessert_items %}
+                <div class="menu-item">
+                    {% if item.image_filename %}
+                        <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                    {% endif %}
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.description }}</p>
+                    <p>Cena: {{ item.price }} PLN</p>
+                    {% if item.customizable %}
+                        <label>Personalizacja:</label>
+                        <input type="text" id="customization-{{ item.id }}" placeholder="Dostosuj zamówienie">
+                    {% endif %}
+                    <button id="add-to-cart-{{ item.id }}" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">Dodaj</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endif %}
+
+<!-- Wyświetlanie kategorii "Śniadania" tylko w godzinach 9:00-13:00 UTC+1 -->
+{% if 'Śniadania' in categories and current_time.hour >= 9 and current_time.hour < 13 %}
+    <h2>Śniadania</h2>
+    <div class="category-section">
+        {% for item in categories['Śniadania'] %}
+            <div class="menu-item">
+                {% if item.image_filename %}
+                    <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                {% endif %}
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <p>Cena: {{ item.price }} PLN</p>
+                {% if item.customizable %}
+                    <label>Personalizacja:</label>
+                    <input type="text" id="customization-{{ item.id }}" placeholder="Dostosuj zamówienie">
+                {% endif %}
+                <button id="add-to-cart-{{ item.id }}" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">Dodaj</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Wyświetlanie pozostałych kategorii -->
+{% for category, items in categories.items() %}
+    {% if category not in ['Lunch Dnia', 'Deser Dnia', 'Śniadania'] %}
+        <h2>{{ category }}</h2>
+        <div class="category-section">
+            {% for item in items %}
+                <div class="menu-item">
+                    {% if item.image_filename %}
+                        <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                    {% endif %}
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.description }}</p>
+                    <p>Cena: {{ item.price }} PLN</p>
+                    {% if item.customizable %}
+                        <label>Personalizacja:</label>
+                        <input type="text" id="customization-{{ item.id }}" placeholder="Dostosuj zamówienie">
+                    {% endif %}
+                    <button id="add-to-cart-{{ item.id }}" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">Dodaj</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endfor %}
+
+<!-- Koszyk -->
+<div id="cart" class="cart">
+    <div class="cart-header">
+        <h3>Twój Koszyk</h3>
+    </div>
+    <ul id="cart-items"></ul>
+    <div class="cart-footer">
+        <p>Suma: <span id="cart-total">0</span> PLN</p>
+        <button onclick="submitOrder()">Zamów</button>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
+
+{% endblock %}

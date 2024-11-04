@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>{% block title %}Aplikacja Restauracyjna{% endblock %}</title>
+</head>
+<body>
+    <!-- Pasek Nawigacyjny -->
+    {% if not request.path.startswith('/menu') and not request.path.startswith('/order_status') %}
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/menu/1" class="nav-link">Menu</a>
+            <a href="/waiter_view" class="nav-link">Widok Kelnera</a>
+            <a href="/admin" class="nav-link">Panel Administratora</a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Główna zawartość strony -->
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

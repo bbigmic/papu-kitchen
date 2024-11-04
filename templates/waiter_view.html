@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Widok Kelnera{% endblock %}
+
+{% block content %}
+<h1>Widok Kelnera</h1>
+
+<div id="active-notifications" class="notifications"></div>
+
+<div id="orders" class="orders">
+    {% for order in orders %}
+        <div class="order" id="order-{{ order.id }}">
+            <h2>Zamówienie nr {{ order.order_number }} - Stolik nr {{ order.table_id }}</h2>
+            <p>Status: {{ order.status }} <a> id: {{order.id}}</a></p>
+            <p>Łączna cena: {{ order.total_price }} PLN</p>
+            <p>Godzina zamówienia: {{ order.created_at.strftime("%H:%M") }}</p>
+            <h3>Szczegóły zamówienia:</h3>
+            <ul>
+                {% for item in order.order_items %}
+                    <li>
+                        {{ item.menu_item.name }} - Ilość: {{ item.quantity }} - Cena: {{ item.menu_item.price }} PLN
+                        {% if item.customization %}
+                            <br><em>Personalizacja: {{ item.customization }}</em>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="post">
+                <button type="submit" class="status-btn">Zamówienie zrealizowane</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('order_history') }}" class="history-link">Zobacz historię zrealizowanych zamówień</a>
+
+<script>
+    // Śledzenie zamówień, które już są wyświetlane
+    const displayedOrders = new Set();
+
+    // Dodaj istniejące zamówienia do zbioru displayedOrders
+    {% for order in orders %}
+        displayedOrders.add({{ order.id }});
+    {% endfor %}
+
+    function dismissNotification(orderId, callType) {
+        // Ukrywanie powiadomienia wizualnie
+        document.getElementById(`notification-${orderId}`).style.display = 'none';
+
+        // Wysłanie odpowiedniego zapytania w zależności od typu powiadomienia
+        const endpoint = callType === "Wezwanie kelnera" ? `/dismiss_call/${orderId}` : `/dismiss_bill/${orderId}`;
+
+        fetch(endpoint, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => console.log("Powiadomienie zamknięte:", data))
+            .catch(error => console.error("Błąd przy zamykaniu powiadomienia:", error));
+    }
+
+    function checkForNewCalls() {
+        fetch('/check_waiter_calls')
+            .then(response => response.json())
+            .then(calls => {
+                const notificationsDiv = document.getElementById("active-notifications");
+                notificationsDiv.innerHTML = '';
+                calls.forEach(call => {
+                    const notification = document.createElement("div");
+                    notification.classList.add("notification");
+                    notification.id = `notification-${call.order_id}`;
+                    
+                    let message = call.call_type === "Wezwanie kelnera"
+                        ? `Zamówienie nr ${call.order_number}: Wezwanie do stolika nr ${call.table_id} - Czas wezwania: ${call.call_time}`
+                        : `Zamówienie nr ${call.order_number}: Prośba o rachunek do stolika nr ${call.table_id} - Płatność: ${call.payment_method}`;
+                    
+                    notification.innerHTML = `
+                        <p>${message}</p>
+                        <button onclick="dismissNotification(${call.order_id}, '${call.call_type}')">Zamknij</button>
+                    `;
+                    notificationsDiv.appendChild(notification);
+                });
+            });
+    }
+
+    function updateOrders() {
+        fetch('/check_new_orders')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Błąd serwera: ${response.status} - ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(orders => {
+                console.log("Otrzymane zamówienia:", orders);
+
+                const ordersDiv = document.getElementById("orders");
+                orders.forEach(order => {
+                    if (!document.getElementById(`order-${order.order_id}`)) {
+                        const orderDiv = document.createElement("div");
+                        orderDiv.classList.add("order");
+                        orderDiv.id = `order-${order.order_id}`;
+
+                        orderDiv.innerHTML = `
+                            <h2>Zamówienie nr ${order.order_number} - Stolik nr ${order.table_id}</h2>
+                            <p>Status: ${order.status} <a> id: ${order.order_id}</a></p>
+                            <p>Łączna cena: ${order.total_price} PLN</p>
+                            <p>Godzina zamówienia: ${order.order_time}</p>
+                            <h3>Szczegóły zamówienia:</h3>
+                            <ul>
+                                ${order.items.map(item => `
+                                    <li>
+                                        ${item.name} - Ilość: ${item.quantity} - Cena: ${item.price} PLN
+                                        ${item.customization ? `<br><em>Personalizacja: ${item.customization}</em>` : ""}
+                                    </li>
+                                `).join("")}
+                            </ul>
+                            <form action="/update_order_status/${order.order_id}" method="post">
+                                <button type="submit" class="status-btn">Zamówienie zrealizowane</button>
+                            </form>
+                        `;
+                        ordersDiv.appendChild(orderDiv);
+                    }
+                });
+            })
+            .catch(error => console.error("Błąd przy pobieraniu zamówień:", error));
+    }
+
+
+    setInterval(() => {
+        checkForNewCalls();
+        updateOrders();
+    }, 5000);
+
+    checkForNewCalls();
+    updateOrders();
+</script>
+{% endblock %}

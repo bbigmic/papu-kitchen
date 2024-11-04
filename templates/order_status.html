@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Status Zamówienia{% endblock %}
+
+{% block content %}
+<div class="status-container">
+    <h2> Przyjęliśmy Twoje zamówienie </h2>
+
+    <div class="action-buttons">
+        <button onclick="callWaiter({{ order.id }})" class="btn">Zawołaj kelnera</button>
+    </div>
+
+    <div class="bill-request">
+        <button onclick="showPaymentOptions()" class="btn">Poproś rachunek</button>
+    </div>
+
+    <!-- Sekcja wyboru metody płatności, początkowo ukryta -->
+    <div id="payment-options" class="payment-options" style="display: none;">
+        <h3>Wybierz metodę płatności</h3>
+        <select id="payment-method">
+            <option value="Karta">Karta</option>
+            <option value="Gotówka">Gotówka</option>
+        </select>
+        <button onclick="requestBill({{ order.id }})" class="btn">Potwierdź</button>
+    </div>
+
+    <h1 style="margin-top:20px;"> Status zamówienia</h1>
+    <h4> W trakcie przygotowania. </h4>
+    <h4>Numer zamówienia: <h1>{{ order.order_number }}</h1> </h4>
+    <p id="timer" class="timer">Przybliżony czas realizacji: <span id="time-remaining">{{ remaining_seconds }}</span></p>
+
+    <div id="spinner" class="spinner"></div>
+
+    <h3>Szczegóły zamówienia:</h3>
+    <ul>
+        {% for item in order.order_items %}
+            <li>
+                {{ item.menu_item.name }} - Ilość: {{ item.quantity }} - Cena: {{ item.menu_item.price }} PLN
+                {% if item.customization %}
+                    <br><em>Personalizacja: {{ item.customization }} (dodatkowe 5 PLN)</em>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <p>Łączna cena: {{ order.total_price }} PLN</p>
+
+    <h2> Życzymy smaczego! </h2>
+</div>
+
+<script>
+    let remainingTime = {{ remaining_seconds }};
+    const timerDisplay = document.getElementById("time-remaining");
+    const spinner = document.getElementById("spinner");
+
+    function updateTimer() {
+        if (remainingTime <= 0) {
+            timerDisplay.innerText = "Zamówienie prawie gotowe!";
+            spinner.style.display = 'none';
+        } else {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            remainingTime--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+
+    updateTimer();
+
+    // Funkcja wezwania kelnera
+    function callWaiter(orderId) {
+        fetch(`/call_waiter/${orderId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Kelner został powiadomiony.");
+            } else if (data.status === "error") {
+                alert(data.message); // Wyświetlenie komunikatu o ograniczeniu czasowym
+            }
+        });
+    }
+
+    function showPaymentOptions() {
+        // Odsłaniamy sekcję z wyborem metody płatności
+        const paymentOptions = document.getElementById("payment-options");
+        paymentOptions.style.display = 'block';
+        
+        // Przewijamy stronę do sekcji płatności
+        // paymentOptions.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function requestBill(orderId) {
+        const paymentMethod = document.getElementById("payment-method").value;
+        fetch(`/request_bill/${orderId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payment_method: paymentMethod })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("Poproszono o rachunek.");
+            document.getElementById("payment-options").style.display = 'none'; // Ukryj sekcję po potwierdzeniu
+        })
+        .catch(error => console.error("Błąd przy prośbie o rachunek:", error));
+    }
+</script>
+{% endblock %}
