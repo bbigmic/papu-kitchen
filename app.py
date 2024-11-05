@@ -371,6 +371,6 @@ def delete_menu_item(item_id):
     return redirect(url_for('admin_panel'))
 
 # Inicjalizacja bazy danych i uruchomienie aplikacji
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))  # Użyj zmiennej PORT, jeśli jest ustawiona
+    app.run(host="0.0.0.0", port=port)
