@@ -62,31 +62,10 @@
     {% endif %}
 {% endif %}
 
-<!-- Wyświetlanie kategorii "Śniadania" tylko w godzinach 9:00-13:00 UTC+1 -->
-{% if 'Śniadania' in categories and current_time.hour >= 9 and current_time.hour < 13 %}
-    <h2>Śniadania</h2>
-    <div class="category-section">
-        {% for item in categories['Śniadania'] %}
-            <div class="menu-item">
-                {% if item.image_filename %}
-                    <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
-                {% endif %}
-                <h3>{{ item.name }}</h3>
-                <p>{{ item.description }}</p>
-                <p>Cena: {{ item.price }} PLN</p>
-                {% if item.customizable %}
-                    <label>Personalizacja:</label>
-                    <input type="text" id="customization-{{ item.id }}" placeholder="Dostosuj zamówienie">
-                {% endif %}
-                <button id="add-to-cart-{{ item.id }}" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">Dodaj</button>
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
 
 <!-- Wyświetlanie pozostałych kategorii -->
 {% for category, items in categories.items() %}
-    {% if category not in ['Lunch Dnia', 'Deser Dnia', 'Śniadania'] %}
+    {% if category not in ['Lunch Dnia', 'Deser Dnia'] %}
         <h2>{{ category }}</h2>
         <div class="category-section">
             {% for item in items %}

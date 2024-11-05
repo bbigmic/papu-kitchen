@@ -13,7 +13,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECRET_KEY")
-app.debug = True
 db = SQLAlchemy(app)
 app.config['UPLOAD_FOLDER'] = 'static/images'  # Ścieżka do przechowywania zdjęć
 
@@ -372,6 +371,6 @@ def delete_menu_item(item_id):
     return redirect(url_for('admin_panel'))
 
 # Inicjalizacja bazy danych i uruchomienie aplikacji
-if __name__ != 'gunicorn':  # Gunicorn to domyślny serwer na Vercel
+if __name__ == '__main__':
     with app.app_context():
         db.create_all()
