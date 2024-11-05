@@ -329,7 +329,9 @@ def add_menu_item():
     return redirect(url_for('admin_panel'))
 
 
-
+@app.route('/healthz')
+def health_check():
+    return "OK", 200
 
 # Edycja pozycji menu
 @app.route('/edit_menu_item/<int:item_id>', methods=['POST'])
