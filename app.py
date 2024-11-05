@@ -14,6 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///dat
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECRET_KEY")
 db = SQLAlchemy(app)
+app.config['DEBUG'] = False
 app.config['UPLOAD_FOLDER'] = 'static/images'  # Ścieżka do przechowywania zdjęć
 
 # Modele bazy danych
