@@ -18,21 +18,26 @@
     
     <label for="category">Kategoria:</label>
     <select id="category" name="category" required onchange="toggleDisplayDateField()">
-        <option value="Śniadania">Śniadania</option>
-        <option value="Bowle">Bowle</option>
-        <option value="Zupy">Zupy</option>
-        <option value="Sałatki">Sałatki</option>
-        <option value="Dania gorące">Dania gorące</option>
+
         <option value="Przystawki">Przystawki</option>
+        <option value="Śniadania">Śniadania</option>
+        <option value="Zupy">Zupy</option>
+        <option value="Bowle">Bowle</option>
+        <option value="Dania główne">Dania główne</option>
+        <option value="Dania dla dzieci">Dania dla dzieci</option>
+        <option value="Sałatki">Sałatki</option>
         <option value="Desery">Desery</option>
-        <option value="Napoje">Napoje</option>
-        <option value="Lunch Dnia">Lunch Dnia</option>
-        <option value="Deser Dnia">Deser Dnia</option>
+        <option value="Napoje ciepłe">Napoje ciepłe</option>
+        <option value="Napoje zimne">Napoje zimne</option>
+        <option value="Napoje specjalne">Napoje specjalne</option>
+        <option value="Alkohole">Alkohole</option>
+        <option value="Lunch dnia">Lunch dnia</option>
+        <option value="Deser dnia">Deser dnia</option>
     </select><br>
     
-    <!-- Pole wyboru daty dla "Lunch Dnia" i "Deser Dnia", domyślnie ukryte -->
+    <!-- Pole wyboru daty dla "Lunch dnia" i "Deser dnia", domyślnie ukryte -->
     <div id="display-date-field" style="display: none;">
-        <label for="display_date">Wybierz datę wyświetlania (tylko dla Lunch Dnia lub Deser Dnia):</label>
+        <label for="display_date">Wybierz datę wyświetlania (tylko dla Lunch dnia lub Deser dnia):</label>
         <input type="date" id="display_date" name="display_date">
     </div>
     
@@ -63,44 +68,22 @@
                 <label for="price">Cena:</label>
                 <input type="number" step="0.01" name="price" value="{{ item.price }}" required><br>
                 
-                <p><strong>Kategoria:</strong> 
-                    {% if item.category == "Śniadania" %}
-                        Śniadania
-                    {% elif item.category == "Zupy" %}
-                        Zupy
-                    {% elif item.category == "Dania gorące" %}
-                        Dania gorące
-                    {% elif item.category == "Lunch Dnia" %}
-                        Lunch Dnia
-                    {% elif item.category == "Deser Dnia" %}
-                        Deser Dnia
-                    {% elif item.category == "Bowle" %}
-                        Bowle
-                    {% elif item.category == "Sałatki" %}
-                        Sałatki
-                    {% elif item.category == "Przystawki" %}
-                        Przystawki
-                    {% elif item.category == "Desery" %}
-                        Desery
-                    {% elif item.category == "Napoje" %}
-                        Napoje
-                    {% else %}
-                        {{ item.category }}
-                    {% endif %}
-                </p>
+                <p><strong>Kategoria:</strong> {{ item.category }}</p>
 
                 <label for="category">Zmień kategorię na:</label>
                 <select name="category" required>
-                    <option value="Lunch Dnia" {% if item.category == "Lunch Dnia" %}selected{% endif %}>Lunch Dnia</option>
-                    <option value="Deser Dnia" {% if item.category == "Deser Dnia" %}selected{% endif %}>Deser Dnia</option>
-                    <option value="Śniadania" {% if item.category == "Śniadania" %}selected{% endif %}>Śniadania</option>
-                    <option value="Bowle" {% if item.category == "Bowle" %}selected{% endif %}>Bowle</option>
-                    <option value="Zupy" {% if item.category == "Zupy" %}selected{% endif %}>Zupy</option>
-                    <option value="Sałatki" {% if item.category == "Sałatki" %}selected{% endif %}>Sałatki</option>
-                    <option value="Dania gorące" {% if item.category == "Dania gorące" %}selected{% endif %}>Dania gorące</option>
                     <option value="Przystawki" {% if item.category == "Przystawki" %}selected{% endif %}>Przystawki</option>
+                    <option value="Śniadania" {% if item.category == "Śniadania" %}selected{% endif %}>Śniadania</option>
+                    <option value="Zupy" {% if item.category == "Zupy" %}selected{% endif %}>Zupy</option>
+                    <option value="Bowle" {% if item.category == "Bowle" %}selected{% endif %}>Bowle</option>
+                    <option value="Dania główne" {% if item.category == "Dania główne" %}selected{% endif %}>Dania główne</option>
+                    <option value="Dania dla dzieci" {% if item.category == "Dania dla dzieci" %}selected{% endif %}>Dania dla dzieci</option>
+                    <option value="Sałatki" {% if item.category == "Sałatki" %}selected{% endif %}>Sałatki</option>
                     <option value="Desery" {% if item.category == "Desery" %}selected{% endif %}>Desery</option>
-                    <option value="Napoje" {% if item.category == "Napoje" %}selected{% endif %}>Napoje</option>
+                    <option value="Napoje ciepłe" {% if item.category == "Napoje ciepłe" %}selected{% endif %}>Napoje ciepłe</option>
+                    <option value="Napoje zimne" {% if item.category == "Napoje zimne" %}selected{% endif %}>Napoje zimne</option>
+                    <option value="Napoje specjalne" {% if item.category == "Napoje specjalne" %}selected{% endif %}>Napoje specjalne</option>
+                    <option value="Alkohole" {% if item.category == "Alkohole" %}selected{% endif %}>Alkohole</option>
                 </select><br>
                 
                 <label for="image">Zmień Zdjęcie:</label>
@@ -119,11 +102,11 @@
 </div>
 
 <script>
-    // Pokazuje lub ukrywa pole daty, jeśli wybrano Lunch Dnia lub Deser Dnia
+    // Pokazuje lub ukrywa pole daty, jeśli wybrano Lunch dnia lub Deser dnia
     function toggleDisplayDateField() {
         const category = document.getElementById("category").value;
         const dateField = document.getElementById("display-date-field");
-        dateField.style.display = (category === "Lunch Dnia" || category === "Deser Dnia") ? "block" : "none";
+        dateField.style.display = (category === "Lunch dnia" || category === "Deser dnia") ? "block" : "none";
     }
 
     // Wywołanie funkcji po załadowaniu strony

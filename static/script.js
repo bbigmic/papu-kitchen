@@ -1,31 +1,28 @@
 const cart = [];
 let total = 0;
 
+
 function addToCart(id, name, price) {
-    // Pobieranie wartości personalizacji
     const customizationInput = document.getElementById(`customization-${id}`);
     const customization = customizationInput ? customizationInput.value : '';
-    let itemPrice = price;
 
-    // Dodaj opłatę 5 PLN, jeśli istnieje personalizacja
-    if (customization) {
-        itemPrice += 5;
-    }
-
-    // Znajdź pozycję w koszyku o tym samym id i tej samej personalizacji
     const existingItem = cart.find(item => item.id === id && item.customization === customization);
 
     if (existingItem) {
         existingItem.quantity += 1;
-        existingItem.totalPrice += itemPrice;
+        existingItem.totalPrice += price;
     } else {
-        cart.push({ id, name, price: itemPrice, quantity: 1, totalPrice: itemPrice, customization });
+        cart.push({ id, name, price, quantity: 1, totalPrice: price, customization });
     }
 
-    total += itemPrice;
+    if (customization) {
+        total += price + 5;
+    } else {
+        total += price;
+    }
+    
     updateCart();
 
-    // Animacja ikony w przycisku „Pokaż Koszyk”
     const cartToggleButton = document.getElementById("cart-toggle-btn");
     cartToggleButton.classList.add("shake");
     setTimeout(() => cartToggleButton.classList.remove("shake"), 500);
@@ -55,6 +52,9 @@ function updateCart() {
         `;
         cartItemsList.appendChild(listItem);
     });
+
+    // Aktualizacja łącznej ceny na przycisku koszyka
+    document.getElementById("cart-toggle-btn").innerHTML = `Pokaż Koszyk<br><span>${total.toFixed(2)} PLN 🛒</span>`;
 
     document.getElementById("cart-total").innerText = total.toFixed(2);
 }
@@ -88,5 +88,9 @@ function toggleCart() {
     cart.classList.toggle("show");
 
     const toggleBtn = document.getElementById("cart-toggle-btn");
-    toggleBtn.innerText = cart.classList.contains("show") ? "🛒 Ukryj Koszyk" : "🛒 Pokaż Koszyk";
+    if (cart.classList.contains("show")) {
+        toggleBtn.innerHTML = `Ukryj Koszyk<br><span>${total.toFixed(2)} PLN 🛒</span>`;
+    } else {
+        toggleBtn.innerHTML = `Pokaż Koszyk<br><span>${total.toFixed(2)} PLN 🛒</span>`;
+    }
 }

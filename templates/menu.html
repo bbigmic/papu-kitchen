@@ -4,9 +4,12 @@
 
 {% block content %}
 
+<h2 style="width:70%;">Składasz zamówienie do stolika nr {{ table_id }}</h2>
+
 <!-- Przycisk do rozwijania koszyka -->
 <button onclick="toggleCart()" id="cart-toggle-btn">
-    🛒 Pokaż Koszyk
+    Pokaż Koszyk
+    <span id="cart-total-price" style="display: block; left: 20px;">0 PLN 🛒</span>
 </button>
 
 <h1>Menu</h1>
@@ -16,8 +19,8 @@
     {% set today = current_time.date() %}
     {% set lunch_items = categories['Lunch Dnia'] | selectattr('display_date', 'equalto', today) | list %}
     {% if lunch_items %}
-        <h2>Lunch Dnia</h2>
-        <div class="category-section">
+        <button class="accordion" onclick="toggleCategory(this)">Lunch Dnia</button>
+        <div class="panel" style="display: none;">
             {% for item in lunch_items %}
                 <div class="menu-item">
                     {% if item.image_filename %}
@@ -41,8 +44,8 @@
 {% if 'Deser Dnia' in categories %}
     {% set dessert_items = categories['Deser Dnia'] | selectattr('display_date', 'equalto', today) | list %}
     {% if dessert_items %}
-        <h2>Deser Dnia</h2>
-        <div class="category-section">
+        <button class="accordion" onclick="toggleCategory(this)">Deser Dnia</button>
+        <div class="panel" style="display: none;">
             {% for item in dessert_items %}
                 <div class="menu-item">
                     {% if item.image_filename %}
@@ -62,12 +65,11 @@
     {% endif %}
 {% endif %}
 
-
 <!-- Wyświetlanie pozostałych kategorii -->
 {% for category, items in categories.items() %}
     {% if category not in ['Lunch Dnia', 'Deser Dnia'] %}
-        <h2>{{ category }}</h2>
-        <div class="category-section">
+        <button class="accordion" onclick="toggleCategory(this)">{{ category }}</button>
+        <div class="panel" style="display: none;">
             {% for item in items %}
                 <div class="menu-item">
                     {% if item.image_filename %}
@@ -100,5 +102,13 @@
 </div>
 
 <script src="/static/script.js"></script>
+
+<script>
+    // Funkcja do rozwijania i zwijania kategorii
+    function toggleCategory(button) {
+        const panel = button.nextElementSibling;
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+</script>
 
 {% endblock %}

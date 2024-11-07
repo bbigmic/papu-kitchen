@@ -27,6 +27,7 @@
     <h1 style="margin-top:20px;"> Status zamówienia</h1>
     <h4> W trakcie przygotowania. </h4>
     <h4>Numer zamówienia: <h1>{{ order.order_number }}</h1> </h4>
+    <h4>Do stolika numer {{ order.table_id }}</h4>
     <p id="timer" class="timer">Przybliżony czas realizacji: <span id="time-remaining">{{ remaining_seconds }}</span></p>
 
     <div id="spinner" class="spinner"></div>
@@ -35,7 +36,7 @@
     <ul>
         {% for item in order.order_items %}
             <li>
-                {{ item.menu_item.name }} - Ilość: {{ item.quantity }} - Cena: {{ item.menu_item.price }} PLN
+                {{ item.menu_item.name }} - Cena: {{ item.menu_item.price }} PLN - Ilość: {{ item.quantity }} 
                 {% if item.customization %}
                     <br><em>Personalizacja: {{ item.customization }} (dodatkowe 5 PLN)</em>
                 {% endif %}

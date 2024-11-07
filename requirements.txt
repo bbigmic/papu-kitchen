@@ -1,8 +1,10 @@
 Flask
 Flask-SQLAlchemy
+Flask-Migrate
 SQLAlchemy
 python-dotenv
 pytz
 Werkzeug
 Pillow
 gunicorn
+psycopg2-binary

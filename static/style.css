@@ -150,9 +150,9 @@ button {
     border-radius: 5px;
     font-size: 1rem;
     z-index: 1000;
-    display: flex;
-    align-items: center;
+    display: block;
     gap: 5px;
+    text-align:left;
     transition: background-color 0.3s;
 }
 
@@ -217,6 +217,36 @@ button {
     align-items: center;
 }
 
+/* Styl przycisku akordeonu dla każdej kategorii */
+.accordion {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.accordion:hover {
+    background-color: #45a049;
+}
+
+/* Panel do wyświetlania elementów kategorii */
+.panel {
+    padding: 0 15px;
+    display: none; /* Początkowo ukryte */
+    background-color: #f9f9f9;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+}
 
 
 button {

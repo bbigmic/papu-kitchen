@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, func
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -10,11 +11,11 @@ import pytz
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///database.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECRET_KEY")
 db = SQLAlchemy(app)
-app.config['DEBUG'] = False
+migrate = Migrate(app, db)
 app.config['UPLOAD_FOLDER'] = 'static/images'  # Ścieżka do przechowywania zdjęć
 
 # Modele bazy danych
@@ -81,21 +82,30 @@ def index():
 # Widok głównego menu dla klientów
 @app.route('/menu/<int:table_id>')
 def menu(table_id):
+
+    # Sprawdzenie, czy numer stolika mieści się w zakresie 1-14
+    if table_id < 1 or table_id > 14:
+        abort(404)  # Zwraca stronę błędu 404, gdy stolik nie istnieje
+
     # Aktualna godzina w strefie czasowej UTC+1
     timezone = pytz.timezone('Europe/Warsaw')
     current_time = datetime.now(timezone)
 
     categories = {
-        "Lunch Dnia": MenuItem.query.filter_by(category="Lunch Dnia").all(),
-        "Deser Dnia": MenuItem.query.filter_by(category="Deser Dnia").all(),
-        "Śniadania": MenuItem.query.filter_by(category="Śniadania").all(),
-        "Bowle": MenuItem.query.filter_by(category="Bowle").all(),
-        "Zupy": MenuItem.query.filter_by(category="Zupy").all(),
-        "Sałatki": MenuItem.query.filter_by(category="Sałatki").all(),
-        "Dania gorące": MenuItem.query.filter_by(category="Dania gorące").all(),
+        "Lunch Dnia": MenuItem.query.filter_by(category="Lunch dnia").all(),
+        "Deser Dnia": MenuItem.query.filter_by(category="Deser dnia").all(),
         "Przystawki": MenuItem.query.filter_by(category="Przystawki").all(),
+        "Śniadania": MenuItem.query.filter_by(category="Śniadania").all(),
+        "Zupy": MenuItem.query.filter_by(category="Zupy").all(),
+        "Bowle": MenuItem.query.filter_by(category="Bowle").all(),
+        "Dania główne": MenuItem.query.filter_by(category="Dania główne").all(),
+        "Dania dla dzieci": MenuItem.query.filter_by(category="Dania dla dzieci").all(),
+        "Sałatki": MenuItem.query.filter_by(category="Sałatki").all(),
         "Desery": MenuItem.query.filter_by(category="Desery").all(),
-        "Napoje": MenuItem.query.filter_by(category="Napoje").all()
+        "Napoje Ciepłe": MenuItem.query.filter_by(category="Napoje ciepłe").all(),
+        "Napoje Zimne": MenuItem.query.filter_by(category="Napoje zimne").all(),
+        "Napoje Specjalne": MenuItem.query.filter_by(category="Napoje specjalne").all(),
+        "Alkohole": MenuItem.query.filter_by(category="Alkohole").all()
     }
     return render_template('menu.html', categories=categories, table_id=table_id, current_time=current_time)
 
@@ -210,32 +220,40 @@ def place_order():
     data = request.json
     table_id = data.get('table_id')
     items = data.get('items')
-    
-    total_price = 0
-    
-    # Oblicz całkowitą cenę zamówienia, dodając opłatę 5 zł za personalizację, jeśli jest obecna
-    for item in items:
-        item_price = item['totalPrice']
-        if item.get('customization'):  # Jeśli istnieje personalizacja
-            item_price += 5  # Dodanie opłaty 5 zł za personalizację
-        total_price += item_price * item['quantity']  # Uwzględnienie ilości przy sumowaniu
 
-    # Tworzymy nowe zamówienie z `table_id` i łączną ceną
-    new_order = Order(table_id=table_id, total_price=total_price)
+    total_price = 0  # Początkowa całkowita cena zamówienia
+
+    # Tworzymy nowe zamówienie z `table_id`
+    new_order = Order(table_id=table_id, total_price=0)  # Ustawienie 0 jako początkowej wartości
     db.session.add(new_order)
     db.session.commit()
-    
-    # Dodajemy wszystkie pozycje zamówienia do tabeli OrderItem
+
+    # Dodajemy wszystkie pozycje zamówienia do tabeli OrderItem i obliczamy całkowitą cenę
     for item in items:
+        quantity = item['quantity']
+        item_total = item['price'] * quantity
+        customization = item.get('customization', '')
+
+        # Dodajemy 5 PLN za personalizację, jeśli jest obecna
+        if customization:
+            item_total += 5 * quantity
+
+        # Dodajemy do całkowitej ceny
+        total_price += item_total
+
+        # Tworzymy nowy wpis w OrderItem
         order_item = OrderItem(
             order_id=new_order.id,
             menu_item_id=item['id'],
-            quantity=item['quantity'],
-            customization=item.get('customization', '')
+            quantity=quantity,
+            customization=customization
         )
         db.session.add(order_item)
+
+    # Aktualizujemy całkowitą cenę zamówienia
+    new_order.total_price = total_price
     db.session.commit()
-    
+
     return jsonify({'order_id': new_order.id, 'status': 'Order placed'})
 
 
@@ -374,6 +392,7 @@ def delete_menu_item(item_id):
     return redirect(url_for('admin_panel'))
 
 # Inicjalizacja bazy danych i uruchomienie aplikacji
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))  # Użyj zmiennej PORT, jeśli jest ustawiona
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', port=5000)
