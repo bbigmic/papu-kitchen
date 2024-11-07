@@ -219,8 +219,13 @@ def dismiss_bill(order_id):
 def place_order():
     data = request.json
     table_id = data.get('table_id')
-    items = data.get('items')
 
+    # Sprawdź, czy table_id istnieje w tabeli 'table'
+    table = Table.query.get(table_id)
+    if not table:
+        return jsonify({"error": "Invalid table ID"}), 400
+
+    items = data.get('items')
     total_price = 0  # Początkowa całkowita cena zamówienia
 
     # Tworzymy nowe zamówienie z `table_id`
