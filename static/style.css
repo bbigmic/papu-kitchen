@@ -219,6 +219,9 @@ button {
 
 /* Styl przycisku akordeonu dla każdej kategorii */
 .accordion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #4CAF50;
     color: white;
     cursor: pointer;
@@ -235,6 +238,14 @@ button {
 
 .accordion:hover {
     background-color: #45a049;
+}
+
+.arrow {
+    transition: transform 0.3s ease; /* Animacja obrotu */
+}
+
+.accordion.active .arrow {
+    transform: rotate(90deg); /* Obrót strzałki w dół, gdy aktywne */
 }
 
 /* Panel do wyświetlania elementów kategorii */

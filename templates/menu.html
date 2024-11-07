@@ -19,7 +19,10 @@
     {% set today = current_time.date() %}
     {% set lunch_items = categories['Lunch Dnia'] | selectattr('display_date', 'equalto', today) | list %}
     {% if lunch_items %}
-        <button class="accordion" onclick="toggleCategory(this)">Lunch Dnia</button>
+        <button class="accordion" onclick="toggleCategory(this)">
+            Lunch Dnia
+            <span class="arrow">&#9654;</span>
+        </button>
         <div class="panel" style="display: none;">
             {% for item in lunch_items %}
                 <div class="menu-item">
@@ -44,7 +47,10 @@
 {% if 'Deser Dnia' in categories %}
     {% set dessert_items = categories['Deser Dnia'] | selectattr('display_date', 'equalto', today) | list %}
     {% if dessert_items %}
-        <button class="accordion" onclick="toggleCategory(this)">Deser Dnia</button>
+        <button class="accordion" onclick="toggleCategory(this)">
+            Deser Dnia
+            <span class="arrow">&#9654;</span>
+        </button>
         <div class="panel" style="display: none;">
             {% for item in dessert_items %}
                 <div class="menu-item">
@@ -68,7 +74,10 @@
 <!-- Wyświetlanie pozostałych kategorii -->
 {% for category, items in categories.items() %}
     {% if category not in ['Lunch Dnia', 'Deser Dnia'] %}
-        <button class="accordion" onclick="toggleCategory(this)">{{ category }}</button>
+        <button class="accordion" onclick="toggleCategory(this)">
+            {{ category }}
+            <span class="arrow">&#9654;</span>
+        </button>
         <div class="panel" style="display: none;">
             {% for item in items %}
                 <div class="menu-item">
@@ -106,6 +115,7 @@
 <script>
     // Funkcja do rozwijania i zwijania kategorii
     function toggleCategory(button) {
+        button.classList.toggle("active");
         const panel = button.nextElementSibling;
         panel.style.display = panel.style.display === "none" ? "block" : "none";
     }
