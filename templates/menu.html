@@ -27,7 +27,7 @@
             {% for item in lunch_items %}
                 <div class="menu-item">
                     {% if item.image_filename %}
-                        <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                        <img src="{{ url_for('uploaded_file', filename=item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
                     {% endif %}
                     <h3>{{ item.name }}</h3>
                     <p>{{ item.description }}</p>
@@ -55,7 +55,7 @@
             {% for item in dessert_items %}
                 <div class="menu-item">
                     {% if item.image_filename %}
-                        <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                        <img src="{{ url_for('uploaded_file', filename=item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
                     {% endif %}
                     <h3>{{ item.name }}</h3>
                     <p>{{ item.description }}</p>
@@ -82,7 +82,7 @@
             {% for item in items %}
                 <div class="menu-item">
                     {% if item.image_filename %}
-                        <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                        <img src="{{ url_for('uploaded_file', filename=item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
                     {% endif %}
                     <h3>{{ item.name }}</h3>
                     <p>{{ item.description }}</p>

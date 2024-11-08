@@ -54,7 +54,7 @@
         <div class="menu-item">
             <!-- Wyświetlanie zdjęcia dania -->
             {% if item.image_filename %}
-                <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
+                <img src="{{ url_for('uploaded_file', filename=item.image_filename) }}" alt="{{ item.name }}" class="menu-item-image">
             {% endif %}
 
             <!-- Formularz aktualizacji -->

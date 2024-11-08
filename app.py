@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, func
 from flask_migrate import Migrate
@@ -395,6 +395,10 @@ def delete_menu_item(item_id):
     db.session.commit()
     flash('Usunięto pozycję z menu.')
     return redirect(url_for('admin_panel'))
+
+@app.route('/images/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Inicjalizacja bazy danych i uruchomienie aplikacji
 if __name__ == '__main__':
