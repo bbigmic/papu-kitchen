@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.getenv("SECRET_KEY")
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-app.config['UPLOAD_FOLDER'] = 'static/images'  # Ścieżka do przechowywania zdjęć
+app.config['UPLOAD_FOLDER'] = '/var/data/images'  # Ścieżka do przechowywania zdjęć
 
 # Modele bazy danych
 class Table(db.Model):
@@ -26,11 +26,11 @@ class Table(db.Model):
 class MenuItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    description = db.Column(db.String(200))
+    description = db.Column(db.String(500))
     price = db.Column(db.Float)
     customizable = db.Column(db.Boolean, default=False)
     category = db.Column(db.String(50))
-    image_filename = db.Column(db.String(100))
+    image_filename = db.Column(db.String(500))
     display_date = db.Column(db.Date, nullable=True)
 
 
