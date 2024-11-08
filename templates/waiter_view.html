@@ -68,8 +68,8 @@
                     notification.id = `notification-${call.order_id}-${call.call_type}`;
 
                     let message = call.call_type === "Wezwanie kelnera"
-                        ? `Zamówienie nr ${call.order_number}: Wezwanie do stolika nr ${call.table_id} - Czas wezwania: ${call.call_time}`
-                        : `Zamówienie nr ${call.order_number}: Prośba o rachunek do stolika nr ${call.table_id} - Płatność: ${call.payment_method}`;
+                        ? `Zamówienie nr ${call.order_number}: Wezwanie do stolika nr ${call.table_id}  <br> Czas wezwania: ${call.call_time}`
+                        : `Zamówienie nr ${call.order_number}: Prośba o rachunek do stolika nr ${call.table_id} - Płatność: ${call.payment_method} <br> Czas wezwania: ${call.call_time}`;
 
                     notification.innerHTML = `
                         <p>${message}</p>
