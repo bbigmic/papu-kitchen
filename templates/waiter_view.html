@@ -45,7 +45,7 @@
 
     function dismissNotification(orderId, callType) {
         // Ukrywanie powiadomienia wizualnie
-        document.getElementById(`notification-${orderId}`).style.display = 'none';
+        document.getElementById(`notification-${orderId}-${callType}`).style.display = 'none';
 
         // Wysłanie odpowiedniego zapytania w zależności od typu powiadomienia
         const endpoint = callType === "Wezwanie kelnera" ? `/dismiss_call/${orderId}` : `/dismiss_bill/${orderId}`;
@@ -65,12 +65,12 @@
                 calls.forEach(call => {
                     const notification = document.createElement("div");
                     notification.classList.add("notification");
-                    notification.id = `notification-${call.order_id}`;
-                    
+                    notification.id = `notification-${call.order_id}-${call.call_type}`;
+
                     let message = call.call_type === "Wezwanie kelnera"
                         ? `Zamówienie nr ${call.order_number}: Wezwanie do stolika nr ${call.table_id} - Czas wezwania: ${call.call_time}`
                         : `Zamówienie nr ${call.order_number}: Prośba o rachunek do stolika nr ${call.table_id} - Płatność: ${call.payment_method}`;
-                    
+
                     notification.innerHTML = `
                         <p>${message}</p>
                         <button onclick="dismissNotification(${call.order_id}, '${call.call_type}')">Zamknij</button>
@@ -123,12 +123,13 @@
             .catch(error => console.error("Błąd przy pobieraniu zamówień:", error));
     }
 
-
+    // Odświeżaj powiadomienia co kilka sekund
     setInterval(() => {
         checkForNewCalls();
         updateOrders();
     }, 5000);
 
+    // Inicjalizacja powiadomień i zamówień
     checkForNewCalls();
     updateOrders();
 </script>

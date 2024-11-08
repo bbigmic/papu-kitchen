@@ -184,17 +184,27 @@ def check_waiter_calls():
     # Przygotowanie listy powiadomień dla kelnera
     calls = []
     for order in orders_with_calls:
-        # Formatowanie informacji o wezwaniu lub prośbie o rachunek
-        call_data = {
-            "order_id": order.id,
-            "order_number": order.order_number,
-            "table_id": order.table_id,
-            "call_type": "Wezwanie kelnera" if order.call_waiter else "Prośba o rachunek",
-            "call_time": order.last_call_time.replace(tzinfo=pytz.utc).astimezone(timezone).strftime("%H:%M:%S") 
-                if order.call_waiter and order.last_call_time else None,
-            "payment_method": order.bill_payment_method if order.request_bill else None
-        }
-        calls.append(call_data)
+        # Dodaj powiadomienie o wezwaniu kelnera, jeśli jest aktywne
+        if order.call_waiter:
+            calls.append({
+                "order_id": order.id,
+                "order_number": order.order_number,
+                "table_id": order.table_id,
+                "call_type": "Wezwanie kelnera",
+                "call_time": order.last_call_time.replace(tzinfo=pytz.utc).astimezone(timezone).strftime("%H:%M:%S"),
+                "payment_method": None
+            })
+        
+        # Dodaj powiadomienie o prośbie o rachunek, jeśli jest aktywne
+        if order.request_bill:
+            calls.append({
+                "order_id": order.id,
+                "order_number": order.order_number,
+                "table_id": order.table_id,
+                "call_type": "Prośba o rachunek",
+                "call_time": order.last_call_time.replace(tzinfo=pytz.utc).astimezone(timezone).strftime("%H:%M:%S") if order.last_call_time else None,
+                "payment_method": order.bill_payment_method
+            })
     
     return jsonify(calls)
 
