@@ -389,6 +389,7 @@ def edit_menu_item(item_id):
 
 # Usuwanie pozycji menu
 @app.route('/delete_menu_item/<int:item_id>', methods=['POST'])
+def delete_menu_item(item_id):
     item = MenuItem.query.get_or_404(item_id)
     # Usunięcie wszystkich powiązanych `OrderItem`
     OrderItem.query.filter_by(menu_item_id=item_id).delete()
